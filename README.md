@@ -8,10 +8,6 @@ The demo shows a similarity graph where:
 - colors indicate cluster membership,
 - clicking a painting opens its metadata and full preview.
 
-## Open locally
-
-Download the repository and open `index.html` in a browser.
-
 ## Related package
 
 https://pypi.org/project/museum-map/
