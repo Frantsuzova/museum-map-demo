@@ -1,4 +1,4 @@
-# Museum Map Demo
+# [Museum Map Demo](https://frantsuzova.github.io/museum-map-demo/)
 
 Interactive demo for visual exploration of painting clusters generated with the `museum-map` Python package.
 
