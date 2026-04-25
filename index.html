@@ -64,11 +64,45 @@
       text-transform: uppercase;
       margin-bottom: 10px;
     }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .brand-logo {
+      width: 58px;
+      height: auto;
+      display: block;
+      opacity: .96;
+      flex: 0 0 auto;
+    }
+    .brand-title {
+      min-width: 0;
+    }
     .intro h1 {
-      margin: 0 0 10px;
+      margin: 0 0 7px;
       font-size: 30px;
       line-height: 1.05;
       letter-spacing: -0.03em;
+    }
+    .repo-link {
+      display: inline-flex;
+      margin-top: 12px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .repo-link:hover {
+      text-decoration: underline;
+    }
+    .credits {
+      margin-top: 10px;
+      color: rgba(245,239,231,0.55);
+      font-size: 12px;
+      line-height: 1.35;
     }
     .intro p {
       margin: 0;
@@ -281,17 +315,31 @@
       background: linear-gradient(90deg, #f5c76b, #ff6b9a, #4d96ff);
       transition: width .2s linear;
     }
+    .restore-ui {
+      position: fixed;
+      right: 24px;
+      top: 24px;
+      display: none;
+      z-index: 80;
+      background: rgba(12,14,22,0.72);
+      border: 1px solid rgba(245,199,107,0.38);
+      color: var(--accent);
+      box-shadow: var(--shadow);
+    }
     body.presentation .intro,
     body.presentation .toolbar,
     body.presentation .stats,
-    body.presentation .hint {
-      opacity: .18;
+    body.presentation .hint,
+    body.presentation .card {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+      transition: opacity .22s ease, transform .22s ease;
     }
-    body.presentation .intro:hover,
-    body.presentation .toolbar:hover,
-    body.presentation .stats:hover,
-    body.presentation .hint:hover {
-      opacity: 1;
+    body.presentation .restore-ui {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     @media (max-width: 900px) {
       .intro { width: 320px; }
@@ -312,9 +360,16 @@
   <div id="mynetwork"></div>
 
   <section class="intro glass">
-    <div class="eyebrow">Interactive demo</div>
-    <h1>Museum Map</h1>
-    <p>Similarity graph of paintings. Nodes are artworks, edges show local visual relations. Click a painting to inspect its neighbourhood.</p>
+    <div class="brand-row">
+      <img src="logo.png" class="brand-logo" />      
+      <div class="brand-title">
+        <div class="eyebrow">Interactive demo</div>
+        <h1>Museum Map</h1>
+      </div>
+    </div>
+    <p>Similarity graph of paintings generated with the Museum Map project. Nodes are artworks, edges show local visual relations. Click a painting to inspect its neighbourhood.</p>
+    <a class="repo-link" href="https://github.com/Frantsuzova/museum-map" target="_blank" rel="noreferrer">Interactive map of visual relationships in art, built with an open-source tool</a>
+    <div class="credits">Created by Anna Chizhik and Katarina Čokrlić</div>
   </section>
 
   <nav class="toolbar glass">
@@ -325,7 +380,7 @@
     <button id="freezeBtn">Freeze</button>
     <button id="edgesBtn">Strong edges</button>
     <button id="resetBtn">Reset</button>
-    <button id="presentationBtn">Presentation</button>
+    <button id="presentationBtn">Focus on map</button>
   </nav>
 
   <section class="stats glass">
@@ -334,6 +389,7 @@
     <div class="stat"><strong>28</strong><span>clusters</span></div>
   </section>
 
+  <button class="restore-ui" id="restoreUiBtn">Show panels</button>
   <div class="hint">Drag to move · Scroll to zoom · Click an artwork to focus its neighbourhood</div>
 
   <aside class="card glass empty" id="artCard">
@@ -637,8 +693,18 @@
       network.fit({ animation: { duration: 850, easingFunction: "easeInOutQuad" } });
     });
 
+    function setPresentationMode(active) {
+      document.body.classList.toggle("presentation", active);
+      document.getElementById("presentationBtn").textContent = active ? "Show panels" : "Focus on map";
+      setTimeout(() => network.fit({ animation: { duration: 650, easingFunction: "easeInOutQuad" } }), 40);
+    }
+
     document.getElementById("presentationBtn").addEventListener("click", () => {
-      document.body.classList.toggle("presentation");
+      setPresentationMode(!document.body.classList.contains("presentation"));
+    });
+
+    document.getElementById("restoreUiBtn").addEventListener("click", () => {
+      setPresentationMode(false);
     });
 
 
@@ -666,7 +732,9 @@
     });
 
     document.addEventListener("keydown", (event) => {
-      if (event.key.toLowerCase() === "p") document.body.classList.toggle("presentation");
+      if (event.key.toLowerCase() === "p" || event.key.toLowerCase() === "h") {
+        setPresentationMode(!document.body.classList.contains("presentation"));
+      }
       if (event.key.toLowerCase() === "f") network.fit({ animation: true });
       if (event.key === "Escape") {
         closeArtworkCard();
